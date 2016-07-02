@@ -1,0 +1,20 @@
+{
+  "name": "multiblob-http",
+  "description": "",
+  "version": "0.0.0",
+  "homepage": "https://github.com/dominictarr/multiblob-http",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/dominictarr/multiblob-http.git"
+  },
+  "dependencies": {
+    "pull-stream": "^3.4.3",
+    "stream-to-pull-stream": "^1.7.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "set -e; for t in test/*.js; do node $t; done"
+  },
+  "author": "'Dominic Tarr' <dominic.tarr@gmail.com> (dominictarr.com)",
+  "license": "MIT"
+}

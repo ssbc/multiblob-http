@@ -3,7 +3,8 @@ var toPull = require('stream-to-pull-stream')
 
 var qs = require('querystring')
 var URL = require('url')
-      //host blobs
+
+//host blobs
 module.exports = function (blobs, url) {
   return function (req, res, next) {
 
@@ -21,7 +22,7 @@ module.exports = function (blobs, url) {
       )
     else if(req.url.indexOf(url+'/get/') == 0) {
       var u = URL.parse('http://makeurlparseright.com'+req.url)
-      var hash = u.pathname.substring((url+'/get/').length)
+      var hash = decodeURIComponent(u.pathname.substring((url+'/get/').length))
       var q = qs.parse(u.query)
 
       if(q.filename)
@@ -33,10 +34,9 @@ module.exports = function (blobs, url) {
       if(q.contentType)
         res.setHeader('Content-Type', q.contentType)
 
-
       blobs.has(hash, function (err, has) {
         if(err) return next(err)
-        if(!has) next(new Error('no blob:'+hash))
+        if(!has) return next(new Error('no blob:'+hash))
 
         res.writeHead(200)
         pull(
@@ -53,5 +53,4 @@ module.exports = function (blobs, url) {
     else next()
   }
 }
-
 

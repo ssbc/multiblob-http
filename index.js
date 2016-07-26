@@ -5,7 +5,8 @@ var qs = require('querystring')
 var URL = require('url')
 
 //host blobs
-module.exports = function (blobs, url) {
+module.exports = function (blobs, url, opts) {
+  opts = opts || {}
   return function (req, res, next) {
 
     next = next || function (err) {
@@ -24,6 +25,10 @@ module.exports = function (blobs, url) {
       var u = URL.parse('http://makeurlparseright.com'+req.url)
       var hash = decodeURIComponent(u.pathname.substring((url+'/get/').length))
       var q = qs.parse(u.query)
+
+      //enable cors by default
+      if(opts.cors !== false)
+        res.setHeader('Access-Control-Allow-Origin', '*')
 
       if(q.filename)
         res.setHeader('Content-Discosition', 'inline; filename='+q.filename)

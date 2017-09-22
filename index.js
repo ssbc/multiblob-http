@@ -52,6 +52,9 @@ module.exports = function (blobs, url, opts) {
         res.setHeader('Access-Control-Allow-Origin', '*')
       }
 
+      // prevent timeout while waiting for blob
+      res.setTimeout(0)
+
       blobs.size(hash, function (err, size) {
         if(err) return next(err)
         if(!size) return next(new Error('no blob:'+hash))

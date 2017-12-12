@@ -81,10 +81,7 @@ module.exports = function (blobs, url, opts) {
           //there is nothing we can do about an error now, since
           //we already wrote the headers. but since we included content-length
           //the client will know it went wrong.
-//          pull.through(null, function (err) {
-//            if(err) throw err //DEBUG
-//            if(err) next(err)
-//          }),
+          opts.transform ? opts.transform (q) : pull.through(),
           toPull(res)
         )
       })
@@ -92,28 +89,5 @@ module.exports = function (blobs, url, opts) {
     else next()
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 

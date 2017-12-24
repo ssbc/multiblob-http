@@ -63,7 +63,7 @@ module.exports = function (blobs, url, opts) {
         res.setHeader('content-length', size)
 
         if(q.filename)
-          res.setHeader('Content-Discosition', 'inline; filename='+q.filename)
+          res.setHeader('Content-Disposition', 'inline; filename='+q.filename)
 
         if(q.gzip)
           res.setHeader('Content-Encoding', 'gzip')

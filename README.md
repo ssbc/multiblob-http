@@ -46,7 +46,8 @@ When it does, it will request with `if-none-modified` set to the hash.
 Since content-addressed files are _never_ modified, the server immediately responds
 with 304 (not modified)
 
-the `content-length` header is always used. This way, if a connection fails somehow,
+the `content-length` header is always used unless "opts.size=false".
+This way, if a connection fails somehow,
 or there is an error later, the browser should detect it.
 
 Of course, it would be way better if browsers just understood content-hashes.

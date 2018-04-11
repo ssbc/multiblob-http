@@ -60,7 +60,7 @@ module.exports = function (blobs, url, opts) {
         if(!size) return next(new Error('no blob:'+hash))
 
         headers(res, hash)
-        if(opts.size === false || q.size)
+        if(opts.size !== false || q.size)
           res.setHeader('content-length', size)
 
         if(q.filename)

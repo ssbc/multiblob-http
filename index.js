@@ -60,7 +60,8 @@ module.exports = function (blobs, url, opts) {
         if(!size) return next(new Error('no blob:'+hash))
 
         headers(res, hash)
-        res.setHeader('content-length', size)
+        if(opts.size === false || q.size)
+          res.setHeader('content-length', size)
 
         if(q.filename)
           res.setHeader('Content-Disposition', 'inline; filename='+q.filename)

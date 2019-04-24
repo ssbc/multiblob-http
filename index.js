@@ -1,5 +1,6 @@
 var pull   = require('pull-stream')
 var toPull = require('stream-to-pull-stream')
+var many = require('pull-many')
 
 var qs = require('querystring')
 var URL = require('url')
@@ -97,19 +98,21 @@ module.exports = function (blobs, url, opts) {
         if(q.gzip)
           res.setHeader('Content-Encoding', 'gzip')
 
-        if(q.contentType) {
-          if (!ranges || ranges.length < 2) {
+        if (!ranges || ranges.length < 2) {
+          if(q.contentType) {
             res.setHeader('Content-Type', q.contentType)
-          } else {
-            res.setHeader('Content-Type', 'multipart/byteranges; boundary=' + boundary)
           }
+        } else {
+          res.setHeader('Content-Type', 'multipart/byteranges; boundary=' + boundary)
         }
 
-        //writing the status code now.
-        res.writeHead(ranges ? 206 : 200)
-        if(req.method === 'HEAD') return res.end()
+        if(req.method === 'HEAD') {
+          res.writeHead(200)
+          return res.end()
+        }
 
         if (!ranges) {
+          res.writeHead(200)
           pull(
             blobs.get(hash),
             //since this is an http stream, handle error the http way.
@@ -120,14 +123,39 @@ module.exports = function (blobs, url, opts) {
             toPull(res)
           )
         } else if (ranges.length == 1) {
+          res.writeHead(206)
           pull(
             blobs.getSlice({hash, start: ranges[0].start, end: ranges[0].end + 1}),
             opts.transform ? opts.transform (q) : pull.through(),
             toPull(res)
           )
         } else {
-          // TODO
-          throw new Error('mulriple ranges are not implemented')
+          var multipart_headers = ranges.map(function(range, i) {
+            return (i ? '\r\n' : '') + '--' + boundary + '\r\n' +
+                   'Content-Type: ' + (q.contentType || 'text/plain') + '\r\n' +
+                   'Content-Range: ' +
+                      ranges.type + ' ' + range.start + '-' + range.end + '/' + size + '\r\n' +
+                    '\r\n'
+          })
+          multipart_headers.push(
+            '\r\n--' + boundary + '--'
+          )
+          let contentLength = ranges.reduce( (a, r)=> a + r.end - r.start + 1, 0)
+          contentLength += multipart_headers.reduce( (a, h) => a + h.length, 0)
+          console.log(contentLength)
+          res.setHeader('Content-Length', contentLength)
+          res.writeHead(206)
+          pull(
+            many([
+              pull.values(multipart_headers.map(s => pull.once(s))),
+              pull.values(ranges.map(range => pull( 
+                blobs.getSlice({hash, start: range.start, end: range.end + 1}),
+                opts.transform ? opts.transform (q) : pull.through()
+              )))
+            ]),
+            pull.flatten(),
+            toPull(res)
+          )
         }
       })
     }

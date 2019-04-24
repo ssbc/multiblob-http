@@ -8,6 +8,7 @@
     "url": "git://github.com/dominictarr/multiblob-http.git"
   },
   "dependencies": {
+    "pull-many": "^1.0.8",
     "pull-stream": "^3.4.3",
     "range-parser": "^1.2.0",
     "stream-to-pull-stream": "^1.7.0"

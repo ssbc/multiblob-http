@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "pull-stream": "^3.4.3",
+    "range-parser": "^1.2.0",
     "stream-to-pull-stream": "^1.7.0"
   },
   "devDependencies": {

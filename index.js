@@ -3,6 +3,7 @@ var toPull = require('stream-to-pull-stream')
 
 var qs = require('querystring')
 var URL = require('url')
+var parseRange = require('range-parser')
 
 var YEAR = 60*60*24*365
 
@@ -14,6 +15,8 @@ function headers(res, hash) {
   res.setHeader('expires', new Date(Date.now()+YEAR*1000).toISOString())
   res.setHeader('expiry', new Date(Date.now()+YEAR*1000).toISOString())
   res.setHeader('etag', hash)
+  // support range requests
+  res.setHeader('accept-ranges', 'bytes')
 }
 
 //host blobs
@@ -60,8 +63,33 @@ module.exports = function (blobs, url, opts) {
         if(!size) return next(new Error('no blob:'+hash))
 
         headers(res, hash)
-        if(opts.size !== false || q.size)
+
+        var boundary
+        var ranges = req.headers.range && parseRange(size, req.headers.range)
+        if (ranges == -2) {
+          // bad request
+          return res.writeHead(400), res.end()
+        } else if (ranges == -1) {
+          // Unsadisfiable range
+          res.setHeader('content-range', 'bytes */' + size)
+          return res.writeHead(416), res.end()
+        }
+        if (!ranges || !ranges.length) ranges = null
+
+        if (ranges) {
+          if (ranges.length>1) {
+            boundary = hash.slice(0, 20)
+            // TODO: set content-length
+          } else {
+            res.setHeader(
+              'content-range', 
+              ranges.type + ' ' + ranges[0].start + '-' + ranges[0].end + '/' + size
+            )
+            res.setHeader('content-length', ranges[0].end - ranges[0].start + 1)
+          }
+        } else if(opts.size !== false || q.size) {
           res.setHeader('content-length', size)
+        }
 
         if(q.filename)
           res.setHeader('Content-Disposition', 'inline; filename='+q.filename)
@@ -69,22 +97,38 @@ module.exports = function (blobs, url, opts) {
         if(q.gzip)
           res.setHeader('Content-Encoding', 'gzip')
 
-        if(q.contentType)
-          res.setHeader('Content-Type', q.contentType)
+        if(q.contentType) {
+          if (!ranges || ranges.length < 2) {
+            res.setHeader('Content-Type', q.contentType)
+          } else {
+            res.setHeader('Content-Type', 'multipart/byteranges; boundary=' + boundary)
+          }
+        }
 
         //writing the status code now.
-        res.writeHead(200)
+        res.writeHead(ranges ? 206 : 200)
         if(req.method === 'HEAD') return res.end()
 
-        pull(
-          blobs.get(hash),
-          //since this is an http stream, handle error the http way.
-          //there is nothing we can do about an error now, since
-          //we already wrote the headers. but since we included content-length
-          //the client will know it went wrong.
-          opts.transform ? opts.transform (q) : pull.through(),
-          toPull(res)
-        )
+        if (!ranges) {
+          pull(
+            blobs.get(hash),
+            //since this is an http stream, handle error the http way.
+            //there is nothing we can do about an error now, since
+            //we already wrote the headers. but since we included content-length
+            //the client will know it went wrong.
+            opts.transform ? opts.transform (q) : pull.through(),
+            toPull(res)
+          )
+        } else if (ranges.length == 1) {
+          pull(
+            blobs.getSlice({hash, start: ranges[0].start, end: ranges[0].end + 1}),
+            opts.transform ? opts.transform (q) : pull.through(),
+            toPull(res)
+          )
+        } else {
+          // TODO
+          throw new Error('mulriple ranges are not implemented')
+        }
       })
     }
     else next()

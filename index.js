@@ -80,8 +80,8 @@ module.exports = function (blobs, url, opts) {
         if (ranges) {
           if (ranges.length>1) {
             boundary = hash.slice(0, 20)
-            // TODO: set content-length
           } else {
+            //request for single range
             res.setHeader(
               'content-range', 
               ranges.type + ' ' + ranges[0].start + '-' + ranges[0].end + '/' + size
@@ -132,7 +132,7 @@ module.exports = function (blobs, url, opts) {
         } else {
           var multipart_headers = ranges.map(function(range, i) {
             return (i ? '\r\n' : '') + '--' + boundary + '\r\n' +
-                   'Content-Type: ' + (q.contentType || 'text/plain') + '\r\n' +
+                   (q.contentType ? 'Content-Type: ' + q.contentType + '\r\n' : '') +
                    'Content-Range: ' +
                       ranges.type + ' ' + range.start + '-' + range.end + '/' + size + '\r\n' +
                     '\r\n'
@@ -142,7 +142,6 @@ module.exports = function (blobs, url, opts) {
           )
           let contentLength = ranges.reduce( (a, r)=> a + r.end - r.start + 1, 0)
           contentLength += multipart_headers.reduce( (a, h) => a + h.length, 0)
-          console.log(contentLength)
           res.setHeader('Content-Length', contentLength)
           res.writeHead(206)
           pull(
@@ -162,5 +161,3 @@ module.exports = function (blobs, url, opts) {
     else next()
   }
 }
-
-

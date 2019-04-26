@@ -45,7 +45,7 @@ test('get multiple ranges', function(t) {
 
   function run() {
     const req = hyperquest({
-      uri: 'http://localhost:8000/blobs/get/' + encodeURIComponent(HASH),
+      uri: 'http://localhost:8000/blobs/get/' + encodeURIComponent(HASH) + '?contentType=' + encodeURIComponent('text/plain'),
       headers: {
         'range': 'bytes=65-65,66-66,67-67'
       }

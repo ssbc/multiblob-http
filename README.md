@@ -29,6 +29,9 @@ you can also set a different prefix, but I use `/blobs`
 
 retrive blob with hash {id}
 
+range requests [rfc 7233](https://tools.ietf.org/html/rfc7233) are supported,
+This enables better video playback in browsers. Browsers tend to refuse to loop videos otherwise and seeking in videos requires range requests. It's also great for extracting embedded thumbnails from JPEGs etc.
+
 ### POST /add
 
 posts to add do not require to have a hash, but will respond with the hash.

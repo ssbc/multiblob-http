@@ -1,9 +1,7 @@
 var pull   = require('pull-stream')
 var toPull = require('stream-to-pull-stream')
 var many = require('pull-many')
-
-var qs = require('querystring')
-var URL = require('url')
+var urlParse = require('url-parse')
 var parseRange = require('range-parser')
 
 var YEAR = 60*60*24*365
@@ -37,13 +35,12 @@ module.exports = function (blobs, url, opts) {
           res.end(hash)
         })
       )
-    else if(req.url.indexOf(url+'/get/') == 0) {
-      if(!(req.method === "GET" || req.method == 'HEAD')) return next()
+    else if(req.url.indexOf(url+'/get/') === 0) {
+      if(!(req.method === "GET" || req.method === 'HEAD')) return next()
 
-      var u = URL.parse('http://makeurlparseright.com'+req.url)
+      var u = urlParse('http://makeurlparseright.com'+req.url, true)
       var hash = decodeURIComponent(u.pathname.substring((url+'/get/').length))
-      var q = qs.parse(u.query)
-
+      var q = u.query
 
       //if a browser revalidates, just tell them it hasn't changed, the hash has not changed.
       if(req.headers['if-none-match'] === hash) {
@@ -67,10 +64,10 @@ module.exports = function (blobs, url, opts) {
 
         var boundary
         var ranges = req.headers.range && parseRange(size, req.headers.range)
-        if (ranges == -2) {
+        if (ranges === -2) {
           // bad request
           return res.writeHead(400), res.end()
-        } else if (ranges == -1) {
+        } else if (ranges === -1) {
           // Unsadisfiable range
           res.setHeader('content-range', 'bytes */' + size)
           return res.writeHead(416), res.end()
@@ -83,7 +80,7 @@ module.exports = function (blobs, url, opts) {
           } else {
             //request for single range
             res.setHeader(
-              'content-range', 
+              'content-range',
               ranges.type + ' ' + ranges[0].start + '-' + ranges[0].end + '/' + size
             )
             res.setHeader('content-length', ranges[0].end - ranges[0].start + 1)
@@ -122,7 +119,7 @@ module.exports = function (blobs, url, opts) {
             opts.transform ? opts.transform (q) : pull.through(),
             toPull(res)
           )
-        } else if (ranges.length == 1) {
+        } else if (ranges.length === 1) {
           res.writeHead(206)
           pull(
             blobs.getSlice({hash, start: ranges[0].start, end: ranges[0].end + 1}),
@@ -147,7 +144,7 @@ module.exports = function (blobs, url, opts) {
           pull(
             many([
               pull.values(multipart_headers.map(s => pull.once(s))),
-              pull.values(ranges.map(range => pull( 
+              pull.values(ranges.map(range => pull(
                 blobs.getSlice({hash, start: range.start, end: range.end + 1}),
                 opts.transform ? opts.transform (q) : pull.through()
               )))

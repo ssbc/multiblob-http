@@ -25,12 +25,12 @@ test('upload test date', function(t) {
     })
     req.on('error', ()=>t.error(err))
     req.on('response', res => {
-      console.log(res.headers)
+      if (process.env.VERBOSE_TESTS) console.log(res.headers)
       t.equal(res.headers['content-length'], '51', 'correct content-length')
       const b = BufferList()
       res.pipe(b)
       res.on('end', ()=>{
-        console.log(b.toString())
+        if (process.env.VERBOSE_TESTS) console.log(b.toString())
         t.equal(b.toString(), HASH, 'correct hash')
         server.close( ()=>t.end())
       })
@@ -51,7 +51,7 @@ test('get from start', function(t) {
     })
     req.on('error', ()=>t.error(err))
     req.on('response', res => {
-      console.log(res.headers)
+      if (process.env.VERBOSE_TESTS) console.log(res.headers)
       t.equal(res.statusCode, 206,'status code')
       t.equal(res.headers['content-length'], '20', 'correct content-length')
       t.equal(res.headers['accept-ranges'], 'bytes', 'correct accept-ranges')
@@ -59,7 +59,7 @@ test('get from start', function(t) {
       const b = BufferList()
       res.pipe(b)
       res.on('end', ()=>{
-        console.log(b.toString('hex'))
+        if (process.env.VERBOSE_TESTS) console.log(b.toString('hex'))
         t.equal(b.toString('hex'), Buffer.from(data).slice(0,20).toString('hex'), 'correct data')
         server.close( ()=>t.end())
       })
@@ -79,7 +79,7 @@ test('get from middle', function(t) {
     })
     req.on('error', ()=>t.error(err))
     req.on('response', res => {
-      console.log(res.headers)
+      if (process.env.VERBOSE_TESTS) console.log(res.headers)
       t.equal(res.statusCode, 206,'status code')
       t.equal(res.headers['content-length'], '10', 'correct content-length')
       t.equal(res.headers['accept-ranges'], 'bytes', 'correct accept-ranges')
@@ -87,7 +87,7 @@ test('get from middle', function(t) {
       const b = BufferList()
       res.pipe(b)
       res.on('end', ()=>{
-        console.log(b.toString('hex'))
+        if (process.env.VERBOSE_TESTS) console.log(b.toString('hex'))
         t.equal(b.toString('hex'), Buffer.from(data).slice(10,20).toString('hex'), 'correct data')
         server.close( ()=>t.end())
       })
@@ -107,7 +107,7 @@ test('last 20 bytes', function(t) {
     })
     req.on('error', ()=>t.error(err))
     req.on('response', res => {
-      console.log(res.headers)
+      if (process.env.VERBOSE_TESTS) console.log(res.headers)
       t.equal(res.statusCode, 206,'status code')
       t.equal(res.headers['content-length'], '20', 'correct content-length')
       t.equal(res.headers['accept-ranges'], 'bytes', 'correct accept-ranges')
@@ -115,7 +115,7 @@ test('last 20 bytes', function(t) {
       const b = BufferList()
       res.pipe(b)
       res.on('end', ()=>{
-        console.log(b.toString('hex'))
+        if (process.env.VERBOSE_TESTS) console.log(b.toString('hex'))
         t.equal(b.toString('hex'), Buffer.from(data).slice(-20).toString('hex'), 'correct data')
         server.close( ()=>t.end())
       })
@@ -135,7 +135,7 @@ test('offset only', function(t) {
     })
     req.on('error', ()=>t.error(err))
     req.on('response', res => {
-      console.log(res.headers)
+      if (process.env.VERBOSE_TESTS) console.log(res.headers)
       t.equal(res.statusCode, 206,'status code')
       t.equal(res.headers['content-length'], '5', 'correct content-length')
       t.equal(res.headers['accept-ranges'], 'bytes', 'correct accept-ranges')
@@ -143,7 +143,7 @@ test('offset only', function(t) {
       const b = BufferList()
       res.pipe(b)
       res.on('end', ()=>{
-        console.log(b.toString('hex'))
+        if (process.env.VERBOSE_TESTS) console.log(b.toString('hex'))
         t.equal(b.toString('hex'), Buffer.from(data).slice(-5).toString('hex'), 'correct data')
         server.close( ()=>t.end())
       })
@@ -163,7 +163,7 @@ test('Unsatisfiable', function(t) {
     })
     req.on('error', ()=>t.error(err))
     req.on('response', res => {
-      console.log(res.headers)
+      if (process.env.VERBOSE_TESTS) console.log(res.headers)
       t.equal(res.statusCode, 416,'status code')
       t.equal(res.headers['accept-ranges'], 'bytes', 'correct accept-ranges')
       t.equal(res.headers['content-range'], 'bytes */256', 'correct content-range')

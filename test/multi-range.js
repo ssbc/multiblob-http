@@ -26,12 +26,12 @@ test('upload test date', function(t) {
     })
     req.on('error', ()=>t.error(err))
     req.on('response', res => {
-      console.log(res.headers)
+      if (process.env.VERBOSE_TESTS) console.log(res.headers)
       t.equal(res.headers['content-length'], '51', 'correct content-length')
       const b = BufferList()
       res.pipe(b)
       res.on('end', ()=>{
-        console.log(b.toString())
+        if (process.env.VERBOSE_TESTS) console.log(b.toString())
         t.equal(b.toString(), HASH, 'correct hash')
         server.close( ()=>t.end())
       })
@@ -52,7 +52,7 @@ test('get multiple ranges', function(t) {
     })
     req.on('error', ()=>t.error(err))
     req.on('response', res => {
-      console.log(res.headers)
+      if (process.env.VERBOSE_TESTS) console.log(res.headers)
       t.equal(res.statusCode, 206,'status code')
       t.equal(res.headers['accept-ranges'], 'bytes', 'correct accept-ranges')
       t.equal(res.headers['content-range'], undefined, 'no content-range')
@@ -60,7 +60,7 @@ test('get multiple ranges', function(t) {
       const b = BufferList()
       res.pipe(b)
       res.on('end', ()=>{
-        console.log(b.toString())
+        if (process.env.VERBOSE_TESTS) console.log(b.toString())
         t.equal(b.length, Number(res.headers['content-length']), 'correct content-length')
         t.equal(b.toString(), fs.readFileSync(__dirname + '/fixture', 'utf8'), 'correct body')
         server.close( ()=>t.end())

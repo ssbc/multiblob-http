@@ -1,27 +1,35 @@
 {
   "name": "multiblob-http",
-  "description": "",
+  "description": "serve content-addressed blobs over http",
   "version": "1.0.0",
-  "homepage": "https://github.com/dominictarr/multiblob-http",
+  "homepage": "https://github.com/ssbc/multiblob-http",
   "repository": {
     "type": "git",
-    "url": "git://github.com/dominictarr/multiblob-http.git"
+    "url": "git://github.com/ssbc/multiblob-http.git"
   },
+  "files": [
+    "*.js"
+  ],
   "dependencies": {
-    "pull-many": "^1.0.8",
-    "pull-stream": "^3.4.3",
-    "range-parser": "^1.2.0",
-    "stream-to-pull-stream": "^1.7.0"
+    "pull-many": "^1.0.9",
+    "pull-stream": "^3.6.14",
+    "range-parser": "^1.2.1",
+    "stream-to-pull-stream": "^1.7.3",
+    "url-parse": "^1.5.3"
   },
   "devDependencies": {
     "bl": "^3.0.0",
     "hyperquest": "^2.1.3",
-    "multiblob": "^1.13.4",
-    "tape": "^4.10.1"
+    "multiblob": "^1.13.7",
+    "tape": "^5.3.1"
   },
   "scripts": {
-    "test": "set -e; for t in test/*.js; do node $t; done"
+    "test": "tape test/*.js",
+    "test-verbose": "VERBOSE_TESTS=1 npm run test"
   },
   "author": "'Dominic Tarr' <dominic.tarr@gmail.com> (dominictarr.com)",
+  "contributors": [
+    "'Andre Staltz' <contact@staltz.com>"
+  ],
   "license": "MIT"
 }

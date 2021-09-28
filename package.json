@@ -20,7 +20,8 @@
     "tape": "^5.3.1"
   },
   "scripts": {
-    "test": "tape test/*.js"
+    "test": "tape test/*.js",
+    "test-verbose": "VERBOSE_TESTS=1 npm run test"
   },
   "author": "'Dominic Tarr' <dominic.tarr@gmail.com> (dominictarr.com)",
   "contributors": [

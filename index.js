@@ -1,9 +1,7 @@
 var pull   = require('pull-stream')
 var toPull = require('stream-to-pull-stream')
 var many = require('pull-many')
-
-var qs = require('querystring')
-var URL = require('url')
+var urlParse = require('url-parse')
 var parseRange = require('range-parser')
 
 var YEAR = 60*60*24*365
@@ -40,10 +38,9 @@ module.exports = function (blobs, url, opts) {
     else if(req.url.indexOf(url+'/get/') === 0) {
       if(!(req.method === "GET" || req.method === 'HEAD')) return next()
 
-      var u = URL.parse('http://makeurlparseright.com'+req.url)
+      var u = urlParse('http://makeurlparseright.com'+req.url, true)
       var hash = decodeURIComponent(u.pathname.substring((url+'/get/').length))
-      var q = qs.parse(u.query)
-
+      var q = u.query
 
       //if a browser revalidates, just tell them it hasn't changed, the hash has not changed.
       if(req.headers['if-none-match'] === hash) {

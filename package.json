@@ -7,6 +7,9 @@
     "type": "git",
     "url": "git://github.com/ssbc/multiblob-http.git"
   },
+  "files": [
+    "*.js"
+  ],
   "dependencies": {
     "pull-many": "^1.0.9",
     "pull-stream": "^3.6.14",

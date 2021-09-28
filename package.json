@@ -23,5 +23,8 @@
     "test": "tape test/*.js"
   },
   "author": "'Dominic Tarr' <dominic.tarr@gmail.com> (dominictarr.com)",
+  "contributors": [
+    "'Andre Staltz' <contact@staltz.com>"
+  ],
   "license": "MIT"
 }

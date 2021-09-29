@@ -48,6 +48,10 @@ module.exports = function (blobs, url, opts) {
         return res.writeHead(304), res.end()
       }
 
+      if (opts.csp) {
+        res.setHeader('Content-Security-Policy', opts.csp)
+      }
+
       //enable cors by default
       if(opts.cors !== false) {
         res.setHeader('Access-Control-Allow-Origin', '*')

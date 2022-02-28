@@ -1,7 +1,6 @@
 var pull   = require('pull-stream')
 var toPull = require('stream-to-pull-stream')
 var many = require('pull-many')
-var urlParse = require('url-parse')
 var parseRange = require('range-parser')
 
 var YEAR = 60*60*24*365

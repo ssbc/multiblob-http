@@ -38,9 +38,9 @@ module.exports = function (blobs, url, opts) {
     else if(req.url.indexOf(url+'/get/') === 0) {
       if(!(req.method === "GET" || req.method === 'HEAD')) return next()
 
-      var u = urlParse('http://makeurlparseright.com'+req.url, true)
-      var hash = decodeURIComponent(u.pathname.substring((url+'/get/').length))
-      var q = u.query
+      const u = new URL('http://makeurlparseright.com'+req.url)
+      const hash = decodeURIComponent(u.pathname.substring((url+'/get/').length))
+      const q = Object.fromEntries(u.searchParams.entries())
 
       //if a browser revalidates, just tell them it hasn't changed, the hash has not changed.
       if(req.headers['if-none-match'] === hash) {

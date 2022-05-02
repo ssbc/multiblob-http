@@ -19,6 +19,10 @@ function headers(res, hash) {
 
 //host blobs
 module.exports = function (blobs, url, opts) {
+  if (!blobs) { 
+    throw new Error("multiblob-http failed to load because `blobs` is null. Did you load the ssb-blobs plugin?");
+  }
+
   opts = opts || {}
   return function (req, res, next) {
 
